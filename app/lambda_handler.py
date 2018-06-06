@@ -4,6 +4,7 @@ import os
 
 from config import logger
 from lex_interface import build_validation_result, try_ex, close, elicit_slot
+from bible_interface import look_up_verse
 
 
 def welcome_message(intent_request):
@@ -92,6 +93,15 @@ def help_message(intent_request):
                     )
 
 
+# keys = intent, value = function to call
+# intent_name : intent_function
+intent_functions = {
+    'LookUpVerse': look_up_verse,
+    'HelpMessage': help_message,
+    'Welcome': welcome_message
+}
+
+
 # --- Intents ---
 def dispatch(intent_request):
     """
@@ -102,11 +112,10 @@ def dispatch(intent_request):
     intent_name = intent_request['currentIntent']['name']
 
     # Dispatch to your bot's intent handlers
-    if intent_name == 'Intent1':
-        return process_intent_1(intent_request)
-    elif intent_name == 'Intent2':
-        return process_intent_2(intent_request)
-    raise Exception('Intent with name ' + intent_name + ' not supported')
+    try:
+        return intent_functions[intent_name](intent_request)
+    except KeyError:
+        raise Exception('Intent with name ' + intent_name + ' not supported')
 
 
 # --- Main handler ---
