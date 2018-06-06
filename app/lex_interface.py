@@ -54,6 +54,11 @@ def elicit_intent(session_attributes, intent_name, message):
 
 
 def close(session_attributes, fulfillment_state, message):
+    if type(message) != dict:
+        message = {'contentType': 'PlainText',
+                   'content': message
+                   }
+        
     response = {
         'sessionAttributes': session_attributes,
         'dialogAction': {
