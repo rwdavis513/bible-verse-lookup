@@ -9,7 +9,7 @@ default_input_from_lex = {
         "currentIntent": {
             "name": "LookUpVerse",
             "slots": {
-                "book": "Joshua"
+                "Book": "Joshua"
             },
             "confirmationStatus": "None"
         },
@@ -35,3 +35,10 @@ def test_lambda_handler():
     resp = lambda_handler(default_input_from_lex, context)
     assert type(resp) == dict
 
+
+def test_lambda_handler_fullfillment():
+    default_input_from_lex['invocationSource'] = 'FulfillmentCodeHook'
+    default_input_from_lex['currentIntent']['slots']['chapter'] = '5'
+    #default_input_from_lex['currentIntent']['slots']['verse'] = '8'
+    resp = lambda_handler(default_input_from_lex, context)
+    assert type(resp) == dict

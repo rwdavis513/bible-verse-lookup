@@ -5,6 +5,7 @@ import os
 from config import logger
 from lex_interface import build_validation_result, try_ex, close, elicit_slot
 from bible_interface import look_up_verse
+import json
 
 
 def welcome_message(intent_request):
@@ -140,4 +141,4 @@ def lambda_handler(event, context):
             'content': "Oops! We had an error. Please pass this message to tech support: {}".format(e)
         }
         response = close(session_attributes, 'Fulfilled', message)
-    return response
+    return json.loads(json.dumps(response))

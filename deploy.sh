@@ -8,7 +8,7 @@ fi
 cp -r app /tmp
 cd /tmp/app
 pip install -r requirements.txt -t .
-zip -R lambda_function.zip *
+zip -r lambda_function.zip *
 s3_location=s3://$S3_BUCKET/lex_bot_lambda.zip
 if [ ! $S3_BUCKET ]
 then
@@ -21,11 +21,14 @@ aws s3 cp lambda_function.zip $s3_location
 
 if [ $1 ]
 then
-if [ $1 = "--update" ]
+if [ $1 = "--no-update" ]
 then
-   echo "Updating Lambda function"
-   ##aws lambda create-function --function-name lex_bot_lambda --runtime python3.6 --role ? --handler lambda_handler --zip-file lambda_function.zip
-   aws lambda update-function-code --function-name lex-bible-verse-lookup --s3-bucket $S3_BUCKET --s3-key lex_bot_lambda.zip
+   echo "Not updating lambda function..."
+   return 1
 fi
 fi
-echo "Complete"
+echo "Updating Lambda function"
+##aws lambda create-function --function-name lex_bot_lambda --runtime python3.6 --role ? --handler lambda_handler --zip-file lambda_function.zip
+aws lambda update-function-code --function-name lex-bible-verse-lookup --s3-bucket $S3_BUCKET --s3-key lex_bot_lambda.zip
+echo "Lambda function updated."
+echo "Complete."

@@ -1,6 +1,6 @@
 import requests
 import config
-from lex_interface import close, elicit_slot
+from lex_interface import close, elicit_slot, delegate
 
 
 def validate_slots(slots):
@@ -10,11 +10,7 @@ def validate_slots(slots):
     :return:
     """
     keys = ['Book', 'chapter', 'verse']
-    for key in keys:
-        try:
-            slots[key]
-        except KeyError:
-            return elicit_slot(slot_to_elicit=key)
+    return [ slots[key] for key in keys]
 
 
 def query_bible_api(book=None, chapter=None, verse=None):
@@ -42,20 +38,29 @@ def look_up_verse(intent_request):
     """
     session_attributes = intent_request['sessionAttributes']
     confirmation_status = intent_request['currentIntent']['confirmationStatus']
-    if 'slots' in intent_request.keys():
+    if 'slots' in intent_request['currentIntent'].keys():
         slots = intent_request['currentIntent']['slots']
     else:
         return elicit_slot(session_attributes=session_attributes,
                            slot_to_elicit='Book',
                            intent_name="LookUpVerse",
-                           slots={""},
+                           slots=None,
                            message="Which book which you look to look up?"
                            )
 
     invocation_status = intent_request['invocationSource']  # 'DialogCodeHook', ReadyForFulfillment
 
     if invocation_status == 'FulfillmentCodeHook' or invocation_status == 'ReadyForFulfillment':
-        book, chapter, verse = validate_slots(slots)
+        try:
+            book, chapter, verse = validate_slots(slots)
+        except KeyError as e:
+            return elicit_slot(slot_to_elicit=e.args[0],
+                               session_attributes=session_attributes,
+                               intent_name="LookUpVerse",
+                               slots=None,
+                               message="Which book which you look to look up?"
+                               )
+
         passage_result = query_bible_api(**{'book': book,
                                           'chapter': chapter,
                                           'verse': verse }
@@ -65,3 +70,5 @@ def look_up_verse(intent_request):
                          'Fulfilled',
                          passage_result,
                          )
+    else:
+        return delegate(session_attributes, slots)
