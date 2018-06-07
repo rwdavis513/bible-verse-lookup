@@ -1,6 +1,6 @@
 import requests
-from app import config
-from app.lex_interface import close, elicit_slot
+import config
+from lex_interface import close, elicit_slot
 
 
 def validate_slots(slots):
@@ -46,12 +46,15 @@ def look_up_verse(intent_request):
         slots = intent_request['currentIntent']['slots']
     else:
         return elicit_slot(session_attributes=session_attributes,
-                           slot_to_elicit='Book'
+                           slot_to_elicit='Book',
+                           intent_name="LookUpVerse",
+                           slots={""},
+                           message="Which book which you look to look up?"
                            )
 
-    invocation_status = intent_request['invocationSource']  # 'DialogCodeHook',
+    invocation_status = intent_request['invocationSource']  # 'DialogCodeHook', ReadyForFulfillment
 
-    if invocation_status == 'FulfillmentCodeHook':
+    if invocation_status == 'FulfillmentCodeHook' or invocation_status == 'ReadyForFulfillment':
         book, chapter, verse = validate_slots(slots)
         passage_result = query_bible_api(**{'book': book,
                                           'chapter': chapter,
