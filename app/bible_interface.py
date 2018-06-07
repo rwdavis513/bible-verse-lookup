@@ -9,7 +9,7 @@ def validate_slots(slots):
     :param slots:
     :return:
     """
-    keys = ['Book', 'chapter', 'verse']
+    keys = ['book', 'chapter', 'verse']
     return [ slots[key] for key in keys]
 
 
@@ -22,7 +22,7 @@ def query_bible_api(book=None, chapter=None, verse=None):
     :return:
     """
     API_URL = "https://api.esv.org/v3/passage/text/?q="
-    query_string = API_URL + book + ' ' + str(chapter) + ':' + str(verse)
+    query_string = API_URL + str(book) + ' ' + str(chapter) + ':' + str(verse)
     result = requests.get(query_string, headers={'Authorization': 'Token ' + config.ESV_API_KEY})
     if result.status_code == 200:
         data = result.json()
@@ -42,7 +42,7 @@ def look_up_verse(intent_request):
         slots = intent_request['currentIntent']['slots']
     else:
         return elicit_slot(session_attributes=session_attributes,
-                           slot_to_elicit='Book',
+                           slot_to_elicit='book',
                            intent_name="LookUpVerse",
                            slots=None,
                            message="Which book which you look to look up?"

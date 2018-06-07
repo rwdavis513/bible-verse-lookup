@@ -6,6 +6,10 @@ import dateutil.parser
 
 def elicit_slot(session_attributes, intent_name, slots, slot_to_elicit, message,
                 response_card=None):
+    if type(message) != dict:
+        message = {'contentType': 'PlainText',
+                   'content': message
+                   }
     if not response_card:
         return {
             'sessionAttributes': session_attributes,
@@ -32,6 +36,10 @@ def elicit_slot(session_attributes, intent_name, slots, slot_to_elicit, message,
 
 
 def confirm_intent(session_attributes, intent_name, slots, message):
+    if type(message) != dict:
+        message = {'contentType': 'PlainText',
+                   'content': message
+                   }
     return {
         'sessionAttributes': session_attributes,
         'dialogAction': {
